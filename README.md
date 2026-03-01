@@ -143,4 +143,8 @@ return match(result, {
 
 ## License
 
-MIT
+[Polyform Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0)
+
+Copyright (c) 2024 Bernard Kirk Katamanso
+
+Free for personal, educational, and noncommercial use. Commercial use prohibited. See [LICENSE](LICENSE).
