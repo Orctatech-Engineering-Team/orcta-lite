@@ -10,6 +10,18 @@ Derived from [orcta-stack](../orcta-stack) — same philosophy, stripped to esse
 - **Result types over exceptions** — explicit error handling
 - **Progressive abstraction** — write it twice before you abstract
 
+Read the full philosophy in [`docs/PHILOSOPHY.md`](docs/PHILOSOPHY.md).
+
+## Documentation
+
+| Doc | What it covers |
+|-----|----------------|
+| [`CLAUDE.md`](CLAUDE.md) | Quick reference for AI agents and developers |
+| [`AGENTS.md`](AGENTS.md) | Work discipline, branching, commits |
+| [`docs/PHILOSOPHY.md`](docs/PHILOSOPHY.md) | The beliefs behind every decision |
+| [`docs/PATTERNS.md`](docs/PATTERNS.md) | Code patterns and conventions |
+| [`docs/WRITING.md`](docs/WRITING.md) | Writing voice and style guide |
+
 ## Quick Start
 
 ```bash
