@@ -74,11 +74,12 @@ src/
 
 ## Adding a Module
 
-Use the scaffolder:
+Use the scaffolder (auto-registers in `app.ts`):
 
 ```bash
-pnpm new:module posts              # basic module
+pnpm new:module posts              # creates + registers
 pnpm new:module posts --with-repo  # with repository file
+pnpm new:module posts --no-register  # skip auto-registration
 ```
 
 Or create manually in `src/modules/`:

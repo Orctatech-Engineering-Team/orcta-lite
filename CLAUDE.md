@@ -57,7 +57,7 @@ modules/{name}/
   {name}.test.ts        # Tests
 ```
 
-Generate with `pnpm new:module <name>` or `pnpm new:module <name> --with-repo`.
+Generate with `pnpm new:module <name>`. Auto-registers in `app.ts`.
 
 Keep it flat until complexity demands otherwise.
 
@@ -66,15 +66,9 @@ Keep it flat until complexity demands otherwise.
 ### Adding a module
 
 ```bash
-pnpm new:module posts
+pnpm new:module posts              # creates + registers
 pnpm new:module posts --with-repo  # includes repository file
-```
-
-Then register in `src/app.ts`:
-
-```typescript
-import posts from "@/modules/posts";
-app.route("/", posts);
+pnpm new:module posts --no-register  # skip auto-registration
 ```
 
 ### Adding a route

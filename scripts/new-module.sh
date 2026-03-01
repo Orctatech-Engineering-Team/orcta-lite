@@ -5,22 +5,25 @@ set -euo pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[0;33m'
 NC='\033[0m' # No Color
 
 # Get script directory and project root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 MODULES_DIR="$PROJECT_ROOT/src/modules"
+APP_FILE="$PROJECT_ROOT/src/app.ts"
 
 # Usage
 usage() {
-    echo -e "${BLUE}Usage:${NC} pnpm new:module <name> [--with-repo]"
+    echo -e "${BLUE}Usage:${NC} pnpm new:module <name> [--with-repo] [--no-register]"
     echo ""
     echo "Arguments:"
-    echo "  name        Module name in kebab-case (e.g., blog-posts)"
+    echo "  name          Module name in kebab-case (e.g., blog-posts)"
     echo ""
     echo "Options:"
-    echo "  --with-repo  Include a repository file for data access"
+    echo "  --with-repo   Include a repository file for data access"
+    echo "  --no-register Skip auto-registration in app.ts"
     echo ""
     echo "Examples:"
     echo "  pnpm new:module posts"
@@ -47,6 +50,49 @@ to_camel_case() {
     echo "${pascal,}"
 }
 
+# Register module in app.ts
+register_module() {
+    local module_name="$1"
+    local camel_name="$2"
+
+    if [[ ! -f "$APP_FILE" ]]; then
+        echo -e "  ${YELLOW}⚠${NC} app.ts not found, skipping registration"
+        return
+    fi
+
+    # Check if already registered
+    if grep -q "from \"@/modules/${module_name}\"" "$APP_FILE"; then
+        echo -e "  ${YELLOW}⚠${NC} Module already registered in app.ts"
+        return
+    fi
+
+    # Find the last module import line and add after it
+    local last_import_line=$(grep -n "from \"@/modules/" "$APP_FILE" | tail -1 | cut -d: -f1)
+
+    if [[ -n "$last_import_line" ]]; then
+        # Add import after last module import
+        sed -i "${last_import_line}a import ${camel_name} from \"@/modules/${module_name}\";" "$APP_FILE"
+        echo -e "  ${GREEN}✓${NC} Added import to app.ts"
+    else
+        # No module imports found, add after hono imports
+        local hono_import_line=$(grep -n "from \"hono" "$APP_FILE" | tail -1 | cut -d: -f1)
+        if [[ -n "$hono_import_line" ]]; then
+            sed -i "${hono_import_line}a\\
+\\
+import ${camel_name} from \"@/modules/${module_name}\";" "$APP_FILE"
+            echo -e "  ${GREEN}✓${NC} Added import to app.ts"
+        fi
+    fi
+
+    # Find the last app.route line and add after it
+    local last_route_line=$(grep -n "app.route(" "$APP_FILE" | tail -1 | cut -d: -f1)
+
+    if [[ -n "$last_route_line" ]]; then
+        sed -i "${last_route_line}a app.route(\"/\", ${camel_name});" "$APP_FILE"
+        echo -e "  ${GREEN}✓${NC} Added route to app.ts"
+    fi
+}
+
 # Main
 if [[ $# -lt 1 ]]; then
     usage
@@ -54,6 +100,7 @@ fi
 
 MODULE_NAME="$1"
 WITH_REPO=false
+NO_REGISTER=false
 
 # Parse flags
 shift
@@ -61,6 +108,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --with-repo)
             WITH_REPO=true
+            shift
+            ;;
+        --no-register)
+            NO_REGISTER=true
             shift
             ;;
         *)
@@ -267,23 +318,30 @@ EOF
 echo -e "  ${GREEN}✓${NC} Created ${MODULE_NAME}.repository.ts"
 fi
 
-# Print next steps
+# Auto-register in app.ts
+if [[ "$NO_REGISTER" == false ]]; then
+    register_module "$MODULE_NAME" "$CAMEL_NAME"
+fi
+
+# Done
 echo ""
 echo -e "${GREEN}Module created successfully!${NC}"
 echo ""
-echo -e "${BLUE}Next steps:${NC}"
-echo ""
-echo "1. Register the module in src/app.ts:"
-echo ""
-echo -e "   ${GREEN}import ${CAMEL_NAME} from \"@/modules/${MODULE_NAME}\";${NC}"
-echo -e "   ${GREEN}app.route(\"/\", ${CAMEL_NAME});${NC}"
-echo ""
+
+if [[ "$NO_REGISTER" == true ]]; then
+    echo -e "${BLUE}Next steps:${NC}"
+    echo ""
+    echo "1. Register the module in src/app.ts:"
+    echo ""
+    echo -e "   ${GREEN}import ${CAMEL_NAME} from \"@/modules/${MODULE_NAME}\";${NC}"
+    echo -e "   ${GREEN}app.route(\"/\", ${CAMEL_NAME});${NC}"
+    echo ""
+fi
 
 if [[ "$WITH_REPO" == true ]]; then
-echo "2. Add your database schema to src/db/schema.ts"
-echo ""
-echo "3. Update the repository with your schema imports"
-echo ""
+    echo "Add your database schema to src/db/schema.ts"
+    echo "Then update the repository with your schema imports"
+    echo ""
 fi
 
 echo "Run tests: pnpm test"
