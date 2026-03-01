@@ -1,5 +1,5 @@
-### Base configuration
-### Set your environment variables here
+# Base configuration
+# Set your environment variables here
 
 @base = http://localhost:3000
 @contentType = application/json

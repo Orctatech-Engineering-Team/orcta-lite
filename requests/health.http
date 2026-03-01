@@ -1,9 +1,9 @@
 ### Health Check
-### Check API and database status
+# Check API and database status
 
 GET {{base}}/health
 
 ### Ping
-### Simple connectivity check
+# Simple connectivity check
 
 GET {{base}}/ping

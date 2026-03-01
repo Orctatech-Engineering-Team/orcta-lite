@@ -266,12 +266,15 @@ echo -e "  ${GREEN}✓${NC} Created ${MODULE_NAME}.test.ts"
 # Generate .http file for API testing
 cat > "$REQUESTS_DIR/${MODULE_NAME}.http" << EOF
 ### List ${PASCAL_NAME}
+
 GET {{base}}/${MODULE_NAME}
 
 ### Get ${PASCAL_NAME} by ID
+
 GET {{base}}/${MODULE_NAME}/{{id}}
 
 ### Create ${PASCAL_NAME}
+
 POST {{base}}/${MODULE_NAME}
 Content-Type: {{contentType}}
 
@@ -280,6 +283,7 @@ Content-Type: {{contentType}}
 }
 
 ### Delete ${PASCAL_NAME}
+
 DELETE {{base}}/${MODULE_NAME}/{{id}}
 EOF
 

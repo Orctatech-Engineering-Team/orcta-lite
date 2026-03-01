@@ -130,15 +130,18 @@ run_requests() {
             fi
         fi
 
-        ((request_count++))
+        ((++request_count))
         executed=true
 
         # Replace variables
         url=$(replace_vars "$url")
         body=$(replace_vars "$body")
 
+        # Strip "### " prefix from name for display
+        local display_name="${current_name#\#\#\# }"
+
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        echo -e "${BOLD}$current_name${NC}"
+        echo -e "${BOLD}${display_name}${NC}"
         echo -e "${GREEN}$method${NC} $url"
         echo ""
 
