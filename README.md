@@ -41,15 +41,16 @@ pnpm dev
 ## Commands
 
 ```bash
-pnpm dev          # Start dev server (tsx watch)
-pnpm build        # Build for production
-pnpm start        # Run production build
-pnpm typecheck    # Type check
-pnpm lint         # Lint with Biome
-pnpm test         # Run tests
-pnpm db:generate  # Generate migration from schema changes
-pnpm db:migrate   # Apply migrations
-pnpm db:studio    # Open Drizzle Studio
+pnpm dev              # Start dev server (tsx watch)
+pnpm build            # Build for production
+pnpm start            # Run production build
+pnpm typecheck        # Type check
+pnpm lint             # Lint with Biome
+pnpm test             # Run tests
+pnpm db:generate      # Generate migration from schema changes
+pnpm db:migrate       # Apply migrations
+pnpm db:studio        # Open Drizzle Studio
+pnpm new:module NAME  # Scaffold a new module
 ```
 
 ## Project Structure
@@ -73,7 +74,14 @@ src/
 
 ## Adding a Module
 
-Create a new directory in `src/modules/`:
+Use the scaffolder:
+
+```bash
+pnpm new:module posts              # basic module
+pnpm new:module posts --with-repo  # with repository file
+```
+
+Or create manually in `src/modules/`:
 
 ```typescript
 // src/modules/posts/index.ts

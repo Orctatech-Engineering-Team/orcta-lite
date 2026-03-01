@@ -14,15 +14,16 @@ Quick reference for working with this codebase. Read [`AGENTS.md`](AGENTS.md) fo
 ## Commands
 
 ```bash
-pnpm dev          # Run dev server (tsx watch, :3000)
-pnpm build        # Build for production
-pnpm start        # Run production build
-pnpm typecheck    # Type check
-pnpm lint         # Lint with Biome
-pnpm test         # Run tests
-pnpm db:generate  # Generate migration from schema changes
-pnpm db:migrate   # Apply migrations
-pnpm db:studio    # Open Drizzle Studio
+pnpm dev              # Run dev server (tsx watch, :3000)
+pnpm build            # Build for production
+pnpm start            # Run production build
+pnpm typecheck        # Type check
+pnpm lint             # Lint with Biome
+pnpm test             # Run tests
+pnpm db:generate      # Generate migration from schema changes
+pnpm db:migrate       # Apply migrations
+pnpm db:studio        # Open Drizzle Studio
+pnpm new:module NAME  # Scaffold a new module
 ```
 
 ## Architecture
@@ -56,9 +57,25 @@ modules/{name}/
   {name}.test.ts        # Tests
 ```
 
+Generate with `pnpm new:module <name>` or `pnpm new:module <name> --with-repo`.
+
 Keep it flat until complexity demands otherwise.
 
 ## Common Patterns
+
+### Adding a module
+
+```bash
+pnpm new:module posts
+pnpm new:module posts --with-repo  # includes repository file
+```
+
+Then register in `src/app.ts`:
+
+```typescript
+import posts from "@/modules/posts";
+app.route("/", posts);
+```
 
 ### Adding a route
 
