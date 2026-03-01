@@ -51,6 +51,7 @@ pnpm db:generate      # Generate migration from schema changes
 pnpm db:migrate       # Apply migrations
 pnpm db:studio        # Open Drizzle Studio
 pnpm new:module NAME  # Scaffold a new module
+pnpm http FILE        # Run .http requests
 ```
 
 ## Project Structure
@@ -149,6 +150,26 @@ return match(result, {
   },
 });
 ```
+
+## API Testing
+
+Use `.http` files in the `requests/` directory:
+
+```bash
+pnpm http list              # List all request files
+pnpm http health            # Run all requests in health.http
+pnpm http health ping       # Run only requests matching "ping"
+pnpm http posts create      # Run "create" request from posts.http
+```
+
+Files work in VSCode (REST Client extension) and terminal. Variables are defined in `requests/_base.http`:
+
+```http
+@base = http://localhost:3000
+@contentType = application/json
+```
+
+Module scaffolder auto-generates `.http` files for new modules.
 
 ## License
 

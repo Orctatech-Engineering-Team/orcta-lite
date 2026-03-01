@@ -24,6 +24,7 @@ pnpm db:generate      # Generate migration from schema changes
 pnpm db:migrate       # Apply migrations
 pnpm db:studio        # Open Drizzle Studio
 pnpm new:module NAME  # Scaffold a new module
+pnpm http FILE        # Run .http requests (e.g., pnpm http health)
 ```
 
 ## Architecture

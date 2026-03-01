@@ -13,6 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 MODULES_DIR="$PROJECT_ROOT/src/modules"
 APP_FILE="$PROJECT_ROOT/src/app.ts"
+REQUESTS_DIR="$PROJECT_ROOT/requests"
 
 # Usage
 usage() {
@@ -262,6 +263,28 @@ EOF
 
 echo -e "  ${GREEN}✓${NC} Created ${MODULE_NAME}.test.ts"
 
+# Generate .http file for API testing
+cat > "$REQUESTS_DIR/${MODULE_NAME}.http" << EOF
+### List ${PASCAL_NAME}
+GET {{base}}/${MODULE_NAME}
+
+### Get ${PASCAL_NAME} by ID
+GET {{base}}/${MODULE_NAME}/{{id}}
+
+### Create ${PASCAL_NAME}
+POST {{base}}/${MODULE_NAME}
+Content-Type: {{contentType}}
+
+{
+  "name": "Test ${PASCAL_NAME}"
+}
+
+### Delete ${PASCAL_NAME}
+DELETE {{base}}/${MODULE_NAME}/{{id}}
+EOF
+
+echo -e "  ${GREEN}✓${NC} Created requests/${MODULE_NAME}.http"
+
 # Generate repository file if requested
 if [[ "$WITH_REPO" == true ]]; then
 cat > "$MODULE_DIR/${MODULE_NAME}.repository.ts" << EOF
@@ -344,4 +367,5 @@ if [[ "$WITH_REPO" == true ]]; then
     echo ""
 fi
 
-echo "Run tests: pnpm test"
+echo -e "Run tests:  ${GREEN}pnpm test${NC}"
+echo -e "Test API:   ${GREEN}pnpm http ${MODULE_NAME}${NC}"

@@ -14,7 +14,8 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"new:module": "./scripts/new-module.sh"
+		"new:module": "./scripts/new-module.sh",
+		"http": "./scripts/http-run.sh"
 	},
 	"dependencies": {
 		"@hono/node-server": "^1.19.7",
