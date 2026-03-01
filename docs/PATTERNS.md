@@ -309,3 +309,124 @@ await db.delete(posts).where(eq(posts.id, id));
 ```
 
 Always wrap in `tryInfra` when used in repositories.
+
+---
+
+## API Testing
+
+Use `.http` files for manual API testing. Works in terminal and VSCode.
+
+### File Structure
+
+```
+requests/
+├── _base.http      # Shared variables
+├── health.http     # Health endpoints
+└── posts.http      # Module endpoints (auto-generated)
+```
+
+### Variables
+
+Define in `requests/_base.http`:
+
+```http
+@base = http://localhost:3000
+@contentType = application/json
+@id = 550e8400-e29b-41d4-a716-446655440000
+```
+
+Use with `{{variable}}` syntax:
+
+```http
+GET {{base}}/posts/{{id}}
+```
+
+### Request Format
+
+```http
+### Request Name
+### Optional description
+
+METHOD {{base}}/path
+Header-Name: value
+
+{
+  "json": "body"
+}
+```
+
+Example:
+
+```http
+### Create Post
+POST {{base}}/posts
+Content-Type: {{contentType}}
+
+{
+  "title": "Hello World",
+  "content": "This is my first post"
+}
+
+### Get Post by ID
+GET {{base}}/posts/{{id}}
+
+### Delete Post
+DELETE {{base}}/posts/{{id}}
+```
+
+### Running Requests
+
+**Terminal:**
+
+```bash
+pnpm http list              # List all .http files
+pnpm http health            # Run all requests in health.http
+pnpm http health ping       # Run requests matching "ping"
+pnpm http posts create      # Run "create" request from posts.http
+```
+
+**VSCode:**
+
+1. Install [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension
+2. Open any `.http` file
+3. Click "Send Request" above any request
+
+### Output
+
+Terminal output includes:
+- Request name
+- Method and URL
+- HTTP status (color-coded)
+- Response body (JSON pretty-printed if `jq` is installed)
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Create Post
+POST http://localhost:3000/posts
+
+HTTP 201
+
+{
+  "success": true,
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "title": "Hello World"
+  }
+}
+```
+
+### Auto-Generation
+
+The module scaffolder generates `.http` files automatically:
+
+```bash
+pnpm new:module posts
+# Creates requests/posts.http with CRUD requests
+```
+
+### Tips
+
+- Keep `_base.http` for shared config — it's loaded automatically
+- Name requests clearly — names are used for filtering
+- Store test IDs as variables for reuse across requests
+- Use separate files per module to keep things organized

@@ -128,6 +128,25 @@ return match(result, {
 });
 ```
 
+## API Testing
+
+`.http` files in `requests/` for manual testing:
+
+```bash
+pnpm http list              # List request files
+pnpm http health            # Run all in health.http
+pnpm http posts create      # Run matching request
+```
+
+Variables in `requests/_base.http`:
+
+```http
+@base = http://localhost:3000
+@contentType = application/json
+```
+
+See [`docs/PATTERNS.md`](docs/PATTERNS.md#api-testing) for full syntax.
+
 ## Environment
 
 Required in `.env`:
