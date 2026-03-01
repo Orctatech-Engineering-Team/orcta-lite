@@ -1,0 +1,134 @@
+# orcta-lite
+
+Minimal Hono + Drizzle template for rapid API experimentation.
+
+Derived from [orcta-stack](../orcta-stack) — same philosophy, stripped to essentials.
+
+## Philosophy
+
+- **Simple is not easy** — understand before you abstract
+- **Result types over exceptions** — explicit error handling
+- **Progressive abstraction** — write it twice before you abstract
+
+## Quick Start
+
+```bash
+# Install dependencies
+pnpm install
+
+# Copy environment file
+cp .env.example .env
+
+# Run migrations
+pnpm db:migrate
+
+# Start development server
+pnpm dev
+```
+
+## Commands
+
+```bash
+pnpm dev          # Start dev server (tsx watch)
+pnpm build        # Build for production
+pnpm start        # Run production build
+pnpm typecheck    # Type check
+pnpm lint         # Lint with Biome
+pnpm test         # Run tests
+pnpm db:generate  # Generate migration from schema changes
+pnpm db:migrate   # Apply migrations
+pnpm db:studio    # Open Drizzle Studio
+```
+
+## Project Structure
+
+```
+src/
+├── index.ts           # Entry point
+├── app.ts             # Hono app setup
+├── env.ts             # Environment config
+├── db/
+│   ├── index.ts       # Drizzle client
+│   └── schema.ts      # Database schema
+├── lib/
+│   ├── result.ts      # Result<T, E> type
+│   ├── infra.ts       # tryInfra wrapper
+│   └── response.ts    # API response helpers
+└── modules/
+    └── health/        # Example module
+        └── index.ts
+```
+
+## Adding a Module
+
+Create a new directory in `src/modules/`:
+
+```typescript
+// src/modules/posts/index.ts
+import { Hono } from "hono";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
+import { jsonSuccess, jsonError, HttpStatus } from "@/lib/response";
+
+const posts = new Hono();
+
+const createPostSchema = z.object({
+  title: z.string().min(1),
+  content: z.string(),
+});
+
+posts.post("/posts", zValidator("json", createPostSchema), async (c) => {
+  const input = c.req.valid("json");
+  // ... create post logic
+  return jsonSuccess(c, { id: "...", ...input }, HttpStatus.CREATED);
+});
+
+export default posts;
+```
+
+Then register in `src/app.ts`:
+
+```typescript
+import posts from "@/modules/posts";
+app.route("/", posts);
+```
+
+## Error Handling Pattern
+
+Use `Result<T, E>` for operations that can fail:
+
+```typescript
+import { ok, err, match, type Result } from "@/lib/result";
+import { tryInfra, type InfrastructureError } from "@/lib/infra";
+
+type NotFound = { type: "NOT_FOUND" };
+type PostError = NotFound | InfrastructureError;
+
+async function findPost(id: string): Promise<Result<Post, PostError>> {
+  const result = await tryInfra(() =>
+    db.query.posts.findFirst({ where: eq(posts.id, id) })
+  );
+
+  if (!result.ok) return result;
+  if (!result.value) return err({ type: "NOT_FOUND" });
+
+  return ok(result.value);
+}
+
+// In handler:
+const result = await findPost(id);
+
+return match(result, {
+  ok: (post) => jsonSuccess(c, post),
+  err: (e) => {
+    if (e.type === "NOT_FOUND") {
+      return jsonError(c, "NOT_FOUND", "Post not found", HttpStatus.NOT_FOUND);
+    }
+    return jsonError(c, "INTERNAL_ERROR", "Database error", HttpStatus.INTERNAL_SERVER_ERROR);
+  },
+});
+```
+
+## License
+
+MIT
